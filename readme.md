@@ -295,3 +295,39 @@ Comment afficher le code sans utiliser `echo` :smiley:
 <h1>Liste des recettes à base de poulet</h1>
 <?php endif; ?><!-- Ni le ";" après le endif -->
 ```
+
+#### Utilisation de la condition `switch` :
+Un des avantages c’est d’avoir un code lisible avec un seul accolade au début et à la fin de la condition. Il n’y a pas besoin d’écrire `==` pour tester une égalité. La mention `case` suffit. 
+**L’inconvénient c’est qu’il est limité au seul test d’égalité**. Les autres opérateurs de comparaisons ne sont pas pris en charges. 
+Les deux codes affichent les mêmes résultats. On voit le nombre d’accolades avec `if`. On répète le test plusieurs fois avec `==`. On indique au début la variable à travailler. On utilise des `case` pour l’analyser. Le mot clé `default` est le message qui s’affiche quelque soit la valeur de notre variable.
+
+Voyons tout cela :
+
+![Capture d’écrans de l’image ifvsswitch1]( https://i.ibb.co/7kjdSbC/ifvsswitch1.png)
+ 
+ 
+![Capture d’écrans de l’image ifvsswitch1]( https://i.ibb.co/g6HBLcT/ifvsswitch2.png)
+
+PHP analyse chaque cas et continue l’opération jusqu’à ce qu’il rencontre la condition et l’instruction `break`. Sans cela, il continuera son analyse et affichera le reste de touts les cas.
+
+#### Utilisation des conditions ternaires.
+Cette une structure conditionnelle assez condensée.  Elle test la valeur d’une variable et lui affecte une autre valeur selon que la condition est vraie ou non.
+
+```
+< ?php 
+$myAge = 24;
+
+// avec if else 
+If ($myAge >= 18){
+$imAdult = true;
+} else{
+$imAdult=false;
+}
+
+// avec une ternaire
+$imAdult=($myAge>=18) ? true : false;
+// ou tout simplement
+$imAdult=($myAge>=18);
+?>
+```
+
