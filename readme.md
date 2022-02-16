@@ -355,3 +355,27 @@ C’est bien mais quel rapport avec les boucles ? Imaginons que c’un tableau d
 
 Elle fonctionne sur le même principe que les conditions. Une boucle permet de répéter des instructions. Il faut une condition d’exécution sinon l’instruction s’exécute en boucle infinie. Tant que la condition est remplie on boucle, sinon on arrête l’instruction et on sort de la boucle :dizzy_face: :dizzy: :dizzy:. 
 
+
+```
+< ?php 
+While($isValid){
+//insctructions
+}
+?>
+
+//Exemple 
+<?php
+$lines = 1;
+
+while ($lines <= 100)
+{
+    echo 'Ceci est la ligne n°' . $lines . '<br />';
+    $lines++;
+}
+/*
+Ceci est la ligne n°1
+Ceci est la ligne n°2
+*/
+```
+Dans cette boucle, `echo` permet d'afficher du texte en PHP et la valeur de `$lines`. La balise HTML <br />  pour aller à la ligne. Et $lines++; incrémente sa valeur ($line = $line + 1).
+
