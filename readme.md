@@ -379,3 +379,37 @@ Ceci est la ligne n°2
 ```
 Dans cette boucle, `echo` permet d'afficher du texte en PHP et la valeur de `$lines`. La balise HTML <br />  pour aller à la ligne. Et $lines++; incrémente sa valeur ($line = $line + 1).
 
+### Utilisation d’une boucle plus complexe : `for` .
+
+La boucle, `for` est un autre type de boucle. Elle a une forme un peu plus condensée et plus commode à écrire. Elle est donc fréquemment utilisée. 
+Pour illustrer on va continuer avec l’exemple nos $users en partant de `while`, mais avec un tableau de tableaux :
+```
+<?php
+//avec while
+$lines = 3; // nombre d'utilisateurs dans le tableau
+$counter = 0;
+
+while ($counter < $lines) {
+    echo $users[$counter][0] . ' ' . $users[$counter][1] . '<br />';
+    $counter++; // Ne surtout pas oublier la condition de sortie !
+} 
+
+//avec for
+<?php
+for ($lines = 0; $lines <= 2; $lines++)
+{
+    echo $users[$lines][0] . ' ' . $users[$lines][1] . '<br />';
+}
+?>
+```
+Les deux donnent le même résultat. Analysons ce qui se passe avec `for`, c’est ce qui nous intéresse içi!
+
+Après le mot for  , il y a des parenthèses qui contiennent trois éléments, séparés par des points-virgules ;  :
+
+Le premier sert à **l'initialisation**. C'est la valeur que l'on donne au départ à la variable (ici, elle vaut 0).
+
+Le second, c'est **la condition**. Comme pour le `while` : tant que la condition est remplie, la boucle est réexécutée. Dès que la condition ne l'est plus, on en sort.
+
+Enfin, le troisième c'est **l'incrémentation**. Cela permet d'ajouter 1 à la variable à chaque tour de boucle. Elle est la condition de sortie.
+
+A ce niveau de connaissance, pour décider entre les deux, on peut se dire que la boucle `for` est adaptée si on sait à l’avance le nombre de fois que l’on veut répéter les instructions. Ici on sait que ce sera trois fois. En revanche si ce n’est pas le cas, on utilisera plutôt `while`.
