@@ -330,4 +330,28 @@ $imAdult=($myAge>=18) ? true : false;
 $imAdult=($myAge>=18);
 ?>
 ```
+## Les BOUCLES
+Ce chapitre traite des boucles, mais nous prendrons les tableaux comme structure de travail. En vrai, boucler sur un tableau c’est fréquent. Ce sont des structures qui gardent en mémoire des éléments qu’on peut parcourir et afficher grâce aux boucles. Je donne un exemple si dessous avec l’affichage des élément contenus à l’intérieur du tableau `$user`.
+```
+<?php
+$user1= ['Prénom Nom, 'email', 'mdp', 34];
+echo $user1[0]; // "Prénom Nom"
+echo $user1[1]; // "email"
+echo $user1[3]; // 37
+```
+On aurait pu déclaré une variable pour chaque élément et les affichés un par un, mais on perdra trop de temps. Avec la structure du tableau les éléments sont réunis dans une seule et même variable grâce aux `[  ]`. Ils sont numérotés de 0 à n éléments, ce sont les `indices`.  
+
+On peut construire des tableaux de tableaux. Imaginons que dans `$user` pour le moment on a qu’un seul utilisateur. On peut créer une variable `$users` qui contiendra le tableau de tous les joueurs.
+
+```
+<?php
+$users = [$user1, $user2, $user3];
+//affichage email $user1
+echo $users[0][1] ;
+```
+C’est bien mais quel rapport avec les boucles ? Imaginons que c’un tableau de recettes de cuisine. On veut toutes les affichées. C’est là que les boucles montrent son utilité.
+
+### Utilisation d’une boucle simple : `while`
+
+Elle fonctionne sur le même principe que les conditions. Une boucle permet de répéter des instructions. Il faut une condition d’exécution sinon l’instruction s’exécute en boucle infinie. Tant que la condition est remplie on boucle, sinon on arrête l’instruction et on sort de la boucle :dizzy_face: :dizzy :dizzy. 
 
