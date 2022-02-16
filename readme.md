@@ -1,4 +1,4 @@
-# PHP :
+# PHP 
 ## Introduction 
 C’est un langage serveur (qui ne peut être lu que par une machine ayant les caractéristiques d’un serveur) qui sert à créer des pages web dynamiques. 
 
