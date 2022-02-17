@@ -413,3 +413,75 @@ Le second, c'est **la condition**. Comme pour le `while` : tant que la condition
 Enfin, le troisième c'est **l'incrémentation**. Cela permet d'ajouter 1 à la variable à chaque tour de boucle. Elle est la condition de sortie.
 
 A ce niveau de connaissance, pour décider entre les deux, on peut se dire que la boucle `for` est adaptée si on sait à l’avance le nombre de fois que l’on veut répéter les instructions. Ici on sait que ce sera trois fois. En revanche si ce n’est pas le cas, on utilisera plutôt `while`.
+
+### LES TABLEAUX `ARRAYS` :
+Les tableaux sont indispensables en PHP. Ce sont des variables à valeurs multiples. Leur compréhension n’étant pas toujours facile. Il en existe deux types : 
+#### Tableaux numérotés 
+Pour construire un tableau numéroté en PHP, on peut soit lister les valeurs dans un crochet `[  ]` soit utiliser la fonction `array() ;`.
+```
+<?php
+//numérotation par les crochets
+$recipes = ['Cassoulet', 'Couscous', 'Escalope Milanaise', 'Salade César',];
+
+// La fonction array permet aussi de créer un array
+$recipes = array('Cassoulet', 'Couscous', 'Escalope Milanaise');
+?>
+//ou encore 
+<?php
+$recipes[0] = 'Cassoulet';
+$recipes[1] = 'Couscous';
+$recipes[2] = 'Escalope Milanaise';
+?>
+//ou aussi
+<?php
+$recipes[] = 'Cassoulet'; // Créera $recipes[0]
+$recipes[] = 'Couscous'; // Créera $recipes[1]
+$recipes[] = 'Escalope Milanaise'; // Créera $recipes[2]
+?>
+```
+Dans un array numéroté, chaque « case » est identifiée par un numéro appelé `clé`. Le premier élément porte le n° 0. C’est cette clé qui indique la position de la case de l’élément dans le tableau. Il sert à l’appeler pour l’afficher.
+```
+<?php
+echo $recipes[1]; // Cela affichera : Couscous
+?>
+``` 
+
+#### Tableaux associatifs
+Dans un tableau associatif, chaque `clé` est une propriété de la variable tableau `array`. 
+Construire un tableau associatif `$recipe`
+Exemple : 
+ ```
+<?php
+// Une bien meilleure façon de stocker une recette !
+$recipe = [
+    'title' => 'Cassoulet',
+    'recipe' => 'Etape 1 : des flageolets, Etape 2 : ...',
+    'author' => 'john.doe@exemple.com',
+    'enabled' => true,
+];
+?>
+``` 
+La `propriété` est associé à sa valeur par le signe `=>`. Içi la propriété `title` est associé à la valeur `cassoulet`.
+
+#### Parcourir un tableau
+Il existe trois moyens pour parcourir un tableau : 
+1-	Boucle `for`
+2-	Boucle `foreach`
+3-	Fonction Print_r() : pour le débogage
+On a vu dans le chapitre sur les boucles comment explorer un tableau avec `for`. 
+
+Avec la boucle `foreach`, chaque ligne parcourue du tableau est placée temporairement dans une variable `$rows`.
+
+```
+<?php
+
+// Déclaration du tableau des recettes
+$recipes = [
+    ['Cassoulet','[...]','mickael.andrieu@exemple.com',true,],
+    ['Couscous','[...]','mickael.andrieu@exemple.com',false,],
+];
+
+foreach ($recipes as $rows) {
+    echo $rows[0]; // Affichera Cassoulet, puis Couscous
+}
+``` 
