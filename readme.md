@@ -477,8 +477,8 @@ Avec la boucle `foreach`, chaque ligne parcourue du tableau est placée temporai
 
 // Déclaration du tableau des recettes
 $recipes = [
-    ['Cassoulet','[...]','mickael.andrieu@exemple.com',true,],
-    ['Couscous','[...]','mickael.andrieu@exemple.com',false,],
+    ['Cassoulet','[...]','prénom.nom@exemple.com',true,],
+    ['Couscous','[...]','prénom.nom@exemple.com',false,],
 ];
 
 foreach ($recipes as $rows) {
