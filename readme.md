@@ -465,9 +465,11 @@ La `propriété` est associé à sa valeur par le signe `=>`. Içi la propriét�
 
 #### Parcourir un tableau
 Il existe trois moyens pour parcourir un tableau : 
-1-	Boucle `for`
-2-	Boucle `foreach`
-3-	Fonction Print_r() : pour le débogage
+
+1.	Boucle `for`
+2.	Boucle `foreach`
+3.	Fonction Print_r() : pour le débogage
+
 On a vu dans le chapitre sur les boucles comment explorer un tableau avec `for`. 
 
 Avec la boucle `foreach`, chaque ligne parcourue du tableau est placée temporairement dans une variable `$rows`.
