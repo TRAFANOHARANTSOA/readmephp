@@ -414,9 +414,9 @@ Enfin, le troisième c'est **l'incrémentation**. Cela permet d'ajouter 1 à la 
 
 A ce niveau de connaissance, pour décider entre les deux, on peut se dire que la boucle `for` est adaptée si on sait à l’avance le nombre de fois que l’on veut répéter les instructions. Ici on sait que ce sera trois fois. En revanche si ce n’est pas le cas, on utilisera plutôt `while`.
 
-### LES TABLEAUX `ARRAYS` :
+## LES TABLEAUX `ARRAYS` :
 Les tableaux sont indispensables en PHP. Ce sont des variables à valeurs multiples. Leur compréhension n’étant pas toujours facile. Il en existe deux types : 
-#### Tableaux numérotés 
+### Tableaux numérotés 
 Pour construire un tableau numéroté en PHP, on peut soit lister les valeurs dans un crochet `[  ]` soit utiliser la fonction `array() ;`.
 ```
 <?php
@@ -446,7 +446,7 @@ echo $recipes[1]; // Cela affichera : Couscous
 ?>
 ``` 
 
-#### Tableaux associatifs
+### Tableaux associatifs
 Dans un tableau associatif, chaque `clé` est une propriété de la variable tableau `array`. 
 Construire un tableau associatif `$recipe`
 Exemple : 
@@ -463,7 +463,7 @@ $recipe = [
 ``` 
 La `propriété` est associé à sa valeur par le signe `=>`. Içi la propriété `title` est associé à la valeur `cassoulet`.
 
-#### Parcourir un tableau
+### Parcourir un tableau
 Il existe trois moyens pour parcourir un tableau : 
 
 1.	Boucle `for`
@@ -562,7 +562,7 @@ foreach($recipe as $property => $propertyValue)
 [author] vaut prénom.nom@exemple.com
 ``` 
 
-#### Afficher un tableau
+### Afficher un tableau
 Pour le débogage, on a besoin de savoir rapidement sans mise en forme ce que contient un tableau, on utilise la fonction `print_r()`. Il est similaire au `echo` pour une variable simple.
 
 ```
@@ -585,8 +585,8 @@ echo '<pre>';
 print_r($recipes);
 echo '</pre>';
 ``` 
-#### Rechercher dans un tableau
-##### Vérifier si une clé existe dans un tableau avec `array_key_exists` :
+### Rechercher dans un tableau
+#### Vérifier si une clé existe dans un tableau avec `array_key_exists` :
 Cette fonction va parcourir le tableau et vérifier si le nom de la clé existe. Il est combiné avec la condition `if`.
 Il renvoi un type booléen :
 1.	`true` si la clé est dans le tableau
@@ -612,7 +612,7 @@ if (array_key_exists('commentaires', $recipe))
 ``` 
 Seule la première condition est vraie, l’autre ne fait rien.
 
-##### Vérifier si une valeur existe dans un tableau avec `in_array ` :
+#### Vérifier si une valeur existe dans un tableau avec `in_array ` :
 Cette fonction va parcourir le tableau et vérifie les valeur. Il est combiné avec la condition `if`.
 Il renvoi un type booléen :
 1.	`true` si la valeur est dans le tableau
@@ -638,7 +638,7 @@ if (in_array('Jhonny Depp', $users))
 ``` 
 Seule la première condition est vraie, l’autre ne fait rien.
 
-##### Récupérer la clé d’une valeur dans un tableau avec `array_search` :
+#### Récupérer la clé d’une valeur dans un tableau avec `array_search` :
 Cette fonction travail aussi avec les valeurs. 
 -	Si la valeur est trouvée, la clé correspondante est renvoyée
 -	Sinon, elle renvoie false ;
@@ -658,3 +658,195 @@ $positionJack = array_search('Jack Doe', $users);
 echo '"Jack" se trouve en position ' . $positionJack. PHP_EOL;
 
 ``` 
+Pour finir sur les tableaux, voyons une application de ce qu'on a vu. L'exercice consiste à afficher des recettes de cuisines suivant leur statuts, `$is_enabled` pour dire en cours de rédaction et que nous n'allons pas afficher.
+
+        ```
+        <?php
+
+        $recipes = [
+            [
+                'title' => 'Cassoulet',
+                'recipe' => 'Etape 1 : des flageolets !',
+                'author' => 'mickael.andrieu@exemple.com',
+                'is_enabled' => true,
+            ],
+            [
+                'title' => 'Couscous',
+                'recipe' => 'Etape 1 : de la semoule',
+                'author' => 'mickael.andrieu@exemple.com',
+                'is_enabled' => false,
+            ],
+            [
+                'title' => 'Escalope milanaise',
+                'recipe' => 'Etape 1 : prenez une belle escalope',
+                'author' => 'mathieu.nebra@exemple.com',
+                'is_enabled' => true,
+            ],
+        ];
+        ?>
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Affichage des recettes</title>
+            <link
+                href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+                rel="stylesheet"
+            >
+        </head>
+        <body>
+            <div class="container">
+                <h1>Affichage des recettes</h1>
+                <!-- Boucle sur les recettes -->
+                <?php foreach($recipes as $recipe) : ?>
+                    <!-- si la clé existe et a pour valeur "vrai", on affiche -->
+                    <?php if (array_key_exists('is_enabled', $recipe) && $recipe['is_enabled'] == true): ?>
+
+                        <article>
+                            <h3><?php echo $recipe['title']; ?></h3>
+                            <div><?php echo $recipe['recipe']; ?></div>
+                            <i><?php echo $recipe['author']; ?></i>
+                        </article>
+
+                    <?php endif; ?>
+                <?php endforeach ?>
+            </div>   
+        </body>
+        </html>
+        ```
+
+
+## LES FONCTIONS :
+Une fonction est une série d'instructions qui effectue des actions et qui retourne une valeur. Il existe des fonctions prêtes à l'emploi sur PHP ce qui veut dire qu'au lieu d'en créer on vérifie si le calcul que l'on souhaite réaliser n'est pas déjà gérer par une fonction existante, sinon on en fabrique. 
+
+A la différence d'une boucle, une fonction est adaptable à souhait. Il automatise de très grands calculs et nous évite la répétition.
+Dans l'exemple précédent, nous avons affichés les recettes selons uniquement leurs status avec des conditions et des boucles. 
+
+Mais imaginons que les conditions d'affichage s'allourdissent au fur et à mesure que l'on avance dans son développement :
+
+1. La clé is_enabled est true  .
+
+2. L'utilisateur doit être connecté.
+
+3. L'utilisateur doit avoir un rôle administrateur.
+
+4. L'utilisateur doit être majeur.
+
+5. Etc.
+
+Cela devient assez vite pénible de se rappeller des calculs mais surtout de devoir se répéter. Et bien on peut faire appel à des petits robots qui automatisent tout ce processus sui sont les fonctions.
+
+### Fonctionnement et appel d'une fonction
+Les fonctions sont souples et prennent diverses informations (nombre, chaine de caractère, un booléen) en `entrée`, c'est ce qu'on appel un `paramètre`. Elle fait ses calculs sur celui ci et donne en `sortie` le résultat `true` ou `false`. Les fonctions permettent de récupérer des informations, de chiffrer des données, de faire des recherche dans du texte, d'envoyer de emails et pleins d'autres choses.
+
+        ```
+        <?php
+
+        $recipe = [
+            'title' => 'Escalope milanaise',
+            'recipe' => '',
+            'author' => 'prénom.nom@exemple.com',
+            'is_enabled' => true,
+        ];
+
+        function allowRecipe(array $recipe): bool{
+            if(array_key_exists('author', $recipe) && $recipe['author'] =='john.doe@exemple.com'){
+                return $recipe['title'].' concoctée par John Doe';
+            }
+
+        }; // création de la fonction
+
+        $is_allowed = allowRecipe($recipe); // appel et técupération du résultat dans une variable;
+
+        echo $is_allowed; //affichage de la variable qui contient le résultat de la fonction
+
+        ```
+    Ici le prefix `array` défini le type de variable attendue. Il est de bon usage de le faire.  Une autre bonne pratique, le typage selon la valeur de retour attendue de notre fonction avec `bool`.
+        
+### Fonctions prêtes à l'emploi de PHP
+Il existe des centaines de fonction proposées par PHP. Impossible de les voirs toutes. Mais si on arrive à en comprendre le fonctionnement général en étudiant quelques une, toutes les autres ne devraient pas nous poser problèmes. Comme dit précédement, les fonctions accèptent en paramètre (donnée d'entrée) plusieurs type. Cela signifie qu'on peut travailler sur du texte par exmple ou des nombres etc.. C'est précisément ce que nous allons voir içi.
+#### Manipulez du texte avec les fonctions
+Si on reprend l'exemple de l'affichage des recettes, nous allons essayé de travailler des fonctions qui exécutent les opérations suivantes :
+
+1. Vérifier si la recette est valide.
+
+                ```
+                <?php
+
+                    function isValidRecipe(array $recipe) : bool
+                    {
+                        if (array_key_exists('is_enabled', $recipe)) {
+                            $isEnabled = $recipe['is_enabled'];
+                        } else {
+                            $isEnabled = false;
+                        }
+
+                        return $isEnabled;
+                    }
+
+                    echo isValidRecipe($recipe). ' ==> c\'est la valeur retournée par isValidRecipe';
+                ```
+    Application avec des tableaux de recettes : 
+            ```
+            <?php
+
+        // 2 exemples
+        $romanSalad = [
+            'title' => 'Salade Romaine',
+            'recipe' => 'Etape 1 : Lavez la salade ; Etape 2 : euh ...',
+            'author' => 'laurene.castor@exemple.com',
+            'is_enabled' => true,
+        ];
+
+        $sushis = [
+            'title' => 'Sushis',
+            'recipe' => 'Etape 1 : du saumon ; Etape 2 : du riz',
+            'author' => 'laurene.castor@exemple.com',
+            'is_enabled' => false,
+        ];
+
+
+        // Répond true !
+        $isRomandSaladValid = isValidRecipe($romanSalad);
+
+        // Répond false !
+        $isSushisValid = isValidRecipe($sushis);
+            ```
+   
+2. Récupérer des recettes à afficher (seulement celles qui sont valident).
+
+    ```
+        $recipes = [...]; // Les recettes
+        
+        // AVANT
+
+        foreach ($recipes as $recipe) {
+            if ($recipe['is_enabled']) {
+                // echo $recipe['title'] ..
+            }
+        }
+
+        // APRES
+
+        function getRecipes(array $recipes) : array
+        {
+            $validRecipes = [];
+
+            foreach($recipes as $recipe) {
+                if (isValidRecipe($recipe)) {
+                    $validRecipes[] = $recipe;
+                }
+            }
+
+            return $validRecipes;
+        }
+
+        // construire l'affichage HTML des recettes
+        foreach(getRecipes($recipes) as $recipe) {
+            echo $recipe['title'], $recipe['recipe'], $recipe['author']. '<br/>'; 
+        }
+
+        ```
+    Ici, la fonction contient le code nécessaire à la récupération des recettes valides. Comme précédemment, on boucle et on ne conserve que les recettes valides identifiées grâce à la fonction  `isValidRecipe`. Il n'est pas nécessaire d'assigner le résultat d'une fonction à une variable ! Nous voyons ici que nous passons directement la fonction `getRecipes` dans la boucle (nous savons que c'est un tableau parce que nous avons défini le type de retour).
+
+3. Récupérer le nom d'un utilisateur en fonction de l'e-mail associé à la création d'une recette.
+    Cette fois, la problématique est de relier l'e-mail associé à un compte utilisateur à l'e-mail utilisé pour la contribution d'une recette :sweat:.
