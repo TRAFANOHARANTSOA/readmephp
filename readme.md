@@ -487,3 +487,174 @@ foreach ($recipes as $rows) {
     echo $rows[0]; // Affichera Cassoulet, puis Couscous
 }
 ``` 
+Utilisation avec un tableau associatif :
+```
+<?php
+$recipe = [
+    'title' => 'Cassoulet',
+    'recipe' => 'Etape 1 : des flageolets, Etape 2 : ...',
+    'author' => 'prénom.nom@exemple.com',
+    'enabled' => true,
+];
+
+foreach ($recipe as $value) {
+    echo $value;
+}
+
+/**
+ * AFFICHE
+ * CassouletEtape 1 : des flageolets, Etape 2 : ...prénom.nom@exemple.com1
+ */
+``` 
+Utilisation avec un tableau de tableaux : 
+ ```
+<?php
+
+$recipes = [
+    [
+        'title' => 'Cassoulet',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => true,
+    ],
+    [
+        'title' => 'Couscous',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => false,
+    ],
+    [
+        'title' => 'Escalope milanaise',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => true,
+    ],
+    [
+        'title' => 'Salade Romaine',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => false,
+    ],
+];
+
+foreach($recipes as $recipe) {
+    echo $recipe['title'] . ' contribué(e) par : ' . $recipe['author'] . PHP_EOL; 
+}
+``` 
+Pour récupérer la clé de l’élément et sa valeur  : `<?php foreach($recipe as $property => $propertyValue) ?>` 
+
+```
+<?php
+$recipe = [
+    'title' => 'Salade Romaine',
+    'recipe' => 'Etape 1 : Lavez la salade ; Etape 2 : euh ...',
+    'author' => 'prénom.nom@exemple.com',
+];
+
+foreach($recipe as $property => $propertyValue)
+{
+    echo '[' . $property . '] vaut ' . $propertyValue . PHP_EOL;
+}
+
+/*affiche : 
+[title] vaut Salade Romaine
+[recipe] vaut Etape 1 : Lavez la salde ; Etap 2 : euh …
+[author] vaut prénom.nom@exemple.com
+``` 
+
+#### Afficher un tableau
+Pour le débogage, on a besoin de savoir rapidement sans mise en forme ce que contient un tableau, on utilise la fonction `print_r()`. Il est similaire au `echo` pour une variable simple.
+
+```
+<?php
+$recipes = [
+    [
+        'title' => 'Cassoulet',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => true,
+    ],
+    [
+        'title' => 'Couscous',
+        'recipe' => '',
+        'author' => 'prénom.nom@exemple.com',
+        'is_enabled' => false,
+    ],
+];
+echo '<pre>';
+print_r($recipes);
+echo '</pre>';
+``` 
+#### Rechercher dans un tableau
+##### Vérifier si une clé existe dans un tableau avec `array_key_exists` :
+Cette fonction va parcourir le tableau et vérifier si le nom de la clé existe. Il est combiné avec la condition `if`.
+Il renvoi un type booléen :
+1.	`true` si la clé est dans le tableau
+2.	`false` si la clé ne se trouve pas dans le tableau
+
+```
+<?php
+$recipe = [
+    'title' => 'Salade Romaine',
+    'recipe' => 'Etape 1 : Lavez la salade ; Etape 2 : euh ...',
+    'author' => 'laurene.castor@exemple.com',
+];
+
+if (array_key_exists('title', $recipe))
+{
+    echo 'La clé "title" se trouve dans la recette !';
+}
+
+if (array_key_exists('commentaires', $recipe))
+{
+    echo 'La clé "commentaires" se trouve dans la recette !';
+}
+``` 
+Seule la première condition est vraie, l’autre ne fait rien.
+
+##### Vérifier si une valeur existe dans un tableau avec `in_array ` :
+Cette fonction va parcourir le tableau et vérifie les valeur. Il est combiné avec la condition `if`.
+Il renvoi un type booléen :
+1.	`true` si la valeur est dans le tableau
+2.	`false` si la valeur ne se trouve pas dans le tableau
+
+```
+<?php
+$users = [
+    'John Doe',
+    'James Doe',
+    'Jack Doe',
+];
+
+if (in_array('John Doe', $users))
+{
+    echo John fait bien partie des utilisateurs enregistrés !';
+}
+
+if (in_array('Jhonny Depp', $users))
+{
+    echo 'Johnny fait bien partie des utilisateurs enregistrés !';
+}
+``` 
+Seule la première condition est vraie, l’autre ne fait rien.
+
+##### Récupérer la clé d’une valeur dans un tableau avec `array_search` :
+Cette fonction travail aussi avec les valeurs. 
+-	Si la valeur est trouvée, la clé correspondante est renvoyée
+-	Sinon, elle renvoie false ;
+
+```
+<?php
+$users = [
+    'John Doe',
+    'James Doe',
+    'Jack Doe',
+];
+
+$positionJohn = array_search('John Doe', $users);
+echo '"John" se trouve en position ' . $positionJohn . PHP_EOL;
+
+$positionJack = array_search('Jack Doe', $users);
+echo '"Jack" se trouve en position ' . $positionJack. PHP_EOL;
+
+``` 
