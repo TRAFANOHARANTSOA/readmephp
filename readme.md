@@ -886,3 +886,58 @@ Au final notre application devrait ressembler à l'image en dessous, avec l'incl
 
 ![Capture d'image include](https://i.ibb.co/7JzqBnK/include.png)
 
+
+## Ecoute de requête des utilisateurs avec les URL (Uniform Ressources locations)
+
+Dans ce chapitre, je vais faire transiter des informations de page en page en me servant des URL. Ces données sont passées en paramètre avec un nom et une valeur. Le paramètre est situé après le nom de la page. Le nom du paramètre est précédé d'un `?` ou d'une `&` si en deuxième position et ainsi de suite. On peut en écrire autant qu'on veut mais il est conseillé de ne pas dépasser 256 caractères. Puis leurs valeurs sont données grâce à un signe `=`.
+L'envoi se fait sous forme de requête avec l'URL. 
+
+![Capture d'image URL](https://i.ibb.co/tJdcXDf/URL.png)
+
+`page.php?param1=valeur1&param2=valeur2&param3=valeur3&param4=valeur4…`
+
+### Créer un lien avec des paramètres
+Prenons deux fichiers `index.php` qui nous sert de page d'accueil et `test.php`. Je veux un lien pour transmettre des informations entre les deux.
+
+![Capture d'image lienURL](https://i.ibb.co/tKMyj0h/lienparam.png)
+
+C'est notre page d'accueil qui reçoit le lien:
+ `<a href="bonjour.php?nom=Dupont&amp;prenom=Jean">Dis-moi bonjour !</a>`
+
+> En HTML, les `&`  soient écrits `&amp;` dans le code source au risque de ne pas passer la validation W3C.
+
+Passons aux choses sérieuses!
+
+### Créer un formulaire avec la méthode `GET`
+La deuxième solution pour faire transiter des informations c'est de soumettre un formulaire avec la méthode 'GET'. La balise `form` doit avoir pour attribut `method` avec comme valeur `GET`.
+    ```
+        <form action="submit_contact.php" method="GET">
+            <div>
+                <label for="email">Email</label>
+                <input type="email" name="email">
+            </div>
+            <div>
+                <label for="message">Votre message</label>
+                <textarea placeholder="Exprimez vous" name="message"></textarea>
+            </div>
+            <button type="submit">Envoyer</button>
+        </form>
+    ```
+D'accord mais on fait comment dans la page de destination pour récupérer l'information?
+
+### Récupérer des paramètres en PHP
+Reprenons le formulaire ci dessus, l'utilisateur rempli son email `utilisateur@exemple.com` et écris le message`Bonjour!`. 
+Le formulaire sera converti en lien : `submit_contact.php?email=utilisateur%40exemple.com&message=Bonjour`.
+Les informations seront à récupérer dans `submit_contact.php` à qui on a soumis le formulaire `contact.php`.
+Lors de cette soumission, une variable superglobale `$_GET` sera créer et contiendra les données envoyées.
+
+![Capture d'image superGlobal](https://i.ibb.co/D8q2x9b/superglobal-GET.png)
+
+On peut manipuler ces informations comme on le souhaite. Je vais faire l'impasse sur l'exemple d'utilisation et je vous redirige sur l'application de recettes que j'ai réalisé tout au long de ce cours. Il y a tout! 
+
+Mais parlons sécurité!
+
+Les informations contenues dans `$_GET` ne sont pas sûres. En vrai, touts ceux qui visitent votre site peuvent modifier l'URL et y mettre ce qu'il veut. Pour sécuriser nos requêtes, nous allons utilisés une fonction qui teste si une variable existe. Il faut s'assurer que `$_GET` contient bien les informations qu'on veut reccueillir. Si ce n'est pas le cas, on n'execute pas la requête (message d'erreur ou autres).
+
+
+
