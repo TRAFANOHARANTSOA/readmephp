@@ -910,6 +910,7 @@ Passons aux choses sérieuses!
 
 ### Créer un formulaire avec la méthode `GET`
 La deuxième solution pour faire transiter des informations c'est de soumettre un formulaire avec la méthode 'GET'. La balise `form` doit avoir pour attribut `method` avec comme valeur `GET`.
+
     ```
         <form action="submit_contact.php" method="GET">
             <div>
@@ -923,6 +924,7 @@ La deuxième solution pour faire transiter des informations c'est de soumettre u
             <button type="submit">Envoyer</button>
         </form>
     ```
+    
 D'accord mais on fait comment dans la page de destination pour récupérer l'information?
 
 ### Récupérer des paramètres en PHP
