@@ -882,5 +882,7 @@ Une des fonctionnalités les plus simples et les plus utiles de PHP est l'inclus
 
 Prenons l'exemple du `header`, il est présent sur toutes vos pages. Pour ne pas recopier son code dans chacune des pages, nous allons organisé le squelette de l'application. Il faut visualiser le découpage du site (en tête, corp, pied de pages) et penser le contenu web en blocs fonctionnels qu'on peut inclure dans les autres blocs. Ainsi, si le site contient 10 pages, il est possible d'inclure la page `header.php` dans chacune d'elles. Et surtout, si on modifie le contenu de `header.php` toutes les autres pages changent. 
 
+Au final notre application devrait ressembler à l'image en dessous, avec l'inclusion de tous les blocs qu'on a créés et appellés une fois.
+
 ![Capture d'image include](https://i.ibb.co/7JzqBnK/include.png)
 
