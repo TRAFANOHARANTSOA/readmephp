@@ -851,7 +851,8 @@ Si on reprend l'exemple de l'affichage des recettes, nous allons essayé de trav
 3. Récupérer le nom d'un utilisateur en fonction de l'e-mail associé à la création d'une recette.
     Cette fois, la problématique est de relier l'e-mail associé à un compte utilisateur à l'e-mail utilisé pour la contribution d'une recette :sweat:.
 
-    Moi je l'ai fait différement du cours Openclassroom : 
+    Voyons cela  : 
+
         ```
                 function displayAuthor(array $recipes, array $users) : array
             {   $displayAuthorInfo = [];
