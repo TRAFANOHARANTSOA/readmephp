@@ -909,7 +909,7 @@ C'est notre page d'accueil qui reçoit le lien:
 Passons aux choses sérieuses!
 
 ### Créer un formulaire avec la méthode `GET`
-La deuxième solution pour faire transiter des informations c'est de soumettre un formulaire avec la méthode 'GET'. La balise `form` doit avoir pour attribut `method` avec comme valeur `GET`.
+La deuxième solution pour faire transiter des informations c'est de soumettre un formulaire avec la méthode 'GET'. La balise `form` doit avoir pour attribut `method` avec comme valeur `GET`. Ci dessous un formulaire de `contact.php` qui transmet des informations à `submit_contact.php`
 
     ```
         <form action="submit_contact.php" method="GET">
@@ -924,7 +924,7 @@ La deuxième solution pour faire transiter des informations c'est de soumettre u
             <button type="submit">Envoyer</button>
         </form>
     ```
-    
+
 D'accord mais on fait comment dans la page de destination pour récupérer l'information?
 
 ### Récupérer des paramètres en PHP
@@ -937,9 +937,58 @@ Lors de cette soumission, une variable superglobale `$_GET` sera créer et conti
 
 On peut manipuler ces informations comme on le souhaite. Je vais faire l'impasse sur l'exemple d'utilisation et je vous redirige sur l'application de recettes que j'ai réalisé tout au long de ce cours. Il y a tout! 
 
+Pour les récupérer dans notre exemple `submit_contact.php` :
+
+    ```
+        <h1>Message bien reçu !</h1>
+                
+        <div class="card">
+            
+            <div class="card-body">
+                <h5 class="card-title">Rappel de vos informations</h5>
+                <p class="card-text"><b>Email</b> : <?php echo $_GET['email']; ?></p>
+                <p class="card-text"><b>Message</b> : <?php echo $_GET['message']; ?></p>
+            </div>
+        </div>
+    ```
+
 Mais parlons sécurité!
 
-Les informations contenues dans `$_GET` ne sont pas sûres. En vrai, touts ceux qui visitent votre site peuvent modifier l'URL et y mettre ce qu'il veut. Pour sécuriser nos requêtes, nous allons utilisés une fonction qui teste si une variable existe. Il faut s'assurer que `$_GET` contient bien les informations qu'on veut reccueillir. Si ce n'est pas le cas, on n'execute pas la requête (message d'erreur ou autres).
+Les informations contenues dans `$_GET` ne sont pas sûres. En vrai, touts ceux qui visitent votre site peuvent modifier l'URL et y mettre ce qu'il veut. Pour sécuriser nos requêtes, nous allons utilisés une fonction qui teste si une variable existe. Il faut s'assurer que `$_GET` contient bien les informations qu'on veut reccueillir. Si ce n'est pas le cas, on n'execute pas la requête (message d'erreur ou redirection).
 
+### Tester la disponibilité des paramètres
+Pour tester si les paramètres sont présents on utilise la fonction `isset()`. Cette fonction teste si une variable existe.
+    ```
+            <?php
 
+        if (!isset($_GET['email']) || !isset($_GET['message']))
+        {
+            echo('Il faut un email et un message pour soumettre le formulaire.');
+            
+            // Arrête l'exécution de PHP
+            return;
+        }
 
+        ?>
+    ```
+Teste si les variables $_GET['email']  et $_GET['message']  existent. Si ils existent pas, on affiche un message. 
+
+### Tester la valeur d'un paramètre
+Ce test révèle l'exactitude des valeurs des paramètres présents dans la requête. Prenons l'exemple d'un paramètre adresse mail de nom `mail` pour lequel une valeur de type `adresse.mail@exemple.com` est attendue. Si l'utilisateur se trompe et que l'adresse envoyée n'est pas valide, on risque de ne plus pouvoir le contacter. Nous devons donc utiliser un `filtre` pour contrôler le type des données avant leurs soumissions. Pour du email, on filtre les données avec la fonction `filter_var`.
+
+Pour un paramètre de nom `message` présent dans l'URL, nous devons juste tester si sa valeur n'est pas vide. On utilise la fonction `empty`.
+Et puisqu'un exemple vaut plus que n'importe quel discours, voyons cela :
+
+    ```
+        <?php   
+        if (
+            (!isset($_GET['email']) || !filter_var($_GET['email'], FILTER_VALIDATE_EMAIL)) 
+            || (!isset($_GET['message']) || empty($_GET['message']))
+            ){
+        
+            echo('Il faut un email et un message pour soumettre le formulaire.');
+            
+            return;
+        }
+        ?>
+    ```
