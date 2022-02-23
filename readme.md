@@ -1094,3 +1094,23 @@ Maintenant on va améliorer notre code avec la fonction `strip_tags`. Elle suppr
     ```
 Il est possible que le script soit envoyé dans des balises HTML. Il existe une fonction `htmlspecialchars` qui transforme les chevrons des balises et les affichent au lieu de les exécutés. 
 
+### Paratage de fichiers 
+Il est possible de partager des fichiers avec un formulaire. Notre formulaire d'envoi doit être paramétrer. Il faut ajouter l'attribut `enctype="multipart/form-data` à `form`. Notre navigateur saura qu'il s'apprete à envoyer des fichiers. Ajoutons à notre formulaire le champ input qui permet l'envoi de fichier et son nom, içi j'envoi une capture d'écran `<input type ="file" name="screenshot"`. 
+
+    ```
+        <form action="submit_contact.php" method="POST" enctype="multipart/form-data">
+            <!-- Ajout des champs email et message -->
+            [...]
+            <!-- Ajout champ d'upload ! -->
+            <div class="mb-3">
+                <label for="screenshot" class="form-label">Votre capture d'écran</label>
+                <input type="file" class="form-control" id="screenshot" name="screenshot" />
+            </div>
+            <!-- Fin ajout du champ -->
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </form>
+    ```
+Ce fichier est envoyé au serveur qui le stock temporairement. C'est à nous de décider si on le garde définitivement ou non.
+
+Dans la page cible `submit_contact.php`, on vas vérifier si le fichier a la bonne extension sinon, il sera refuser. Si oui, il sera accépter définitivement grâce à la fonction `move_uploaded_file`
+
