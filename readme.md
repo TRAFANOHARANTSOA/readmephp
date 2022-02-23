@@ -992,3 +992,105 @@ Et puisqu'un exemple vaut plus que n'importe quel discours, voyons cela :
         }
         ?>
     ```
+## Administrer les formulaires sécurisés.
+Nous avons vu des formulaires basiques pour envoyer une URL. La sécurisation des informations véhiculées passe par le contrôle du formulaire qui les transportent. Nous savons que dans HTML, la balise `<form>` est utilisée pour insérer un formulaire. Les attributs `action` et `method` désignent réspectivement la `cible` et la `méthode de transmission` des informations. Focalisons sur la méthode.
+
+### Les méthodes de transmissions `POST & GET`
+Plusieurs moyens existent, deux sont utilisés fréquement : 
+1. `GET` : les données transitent par l'URL, la variable superglobale `$_GET` de type `array` les stockent temporairement. Cette méthode est limité par la taille de l'URL (généralement 256 caractères). Elle n'est pas sécuritaire car les données sont visibles de tous.
+2. `POST` : les données ne transitent pas par l'URL. Cette méthode permet d'envoyer autant de données que l'on veut. De même que sa consoeur, les données ne sont pas sécurisées. Les données sont accéssibles dans la supérvariable `$_POST` (tableau également). 
+
+On applique les mêmes règles de sécurité à `GET & POST`. Néanmoins pour nos formulaires, on priviligie `POST` car le volume d'informations transmis n'est pas limité.
+
+### Définir la cible des données à transmettre.
+L'attribut `action` de `form` définit la page appelée par le formulaire. Elle est destinataire et chargée de traiter les données envoyées. Les informations sont accéssibles par utilisation des superglobales `$_GET` ou `$_POST` selon la méthode utilisé.
+
+Il y a donc deux pages de travails, prenons l'exemplte de `contac.php` qui contient le formulaire et `submit_contact.php` qui reçoit et traite les données.
+
+### Les champs `input` et l'attribut `name`.
+La variable `$_GET` prend comme clé la valeur de l'attribut `name` et aura pour valeur l'information soummise par l'utilisateur.
+```
+<input type="text" name="nom" value="Mateo21" />//value est la valeur soummise par l'utilisateur
+
+<?php
+
+// Après soumission du formulaire
+echo $_GET['nom']; // "Mateo21"
+
+// OU
+
+echo $_POST['nom']; // "Mateo21"
+``` 
+### Les champs cachés.
+C'est un code dans votre formulaire qui n'apparaîtra pas aux yeux du visiteur, mais qui va quand même créer une variable avec une valeur. On peut s'en servir pour transmettre des informations fixes.
+Exemple de champ caché : `<input type="hidden" name="pseudo" value="Mateo21" />`
+Champ caché ne veut pas dire que personne ne peut les voirs, il suffit d'afficher le code source HTML pour voir les informations.
+
+### La faille XSS
+
+La faille XSS (pour cross-site scripting) est une technique qui consiste à injecter du code HTML contenant du JavaScript dans vos pages, pour le faire exécuter à vos visiteurs. Reprenons notre formulaire pour montrer un exemple simple d'exécution d'un script par le navigateur. Imaginons que notre utilisateur envoi le formulaire ci dessous et que notre serveur l'enregistre dans sa base parmi les messages.
+    ```
+    <form action="submit_contact.php" method="GET">
+        <div>
+            <label for="email">Email</label>
+            <input type="email" name="email" value='Ecrivez votre mail içi'>
+        </div>
+        <div>
+            <label for="message">Votre message</label>
+            <textarea placeholder="Exprimez vous" name="message" value = 'valeur par défaut modifiable'><script> alert('Boom')</script></textarea>
+        </div>
+        <button type="submit">Envoyer</button>
+    </form>
+    ```
+Maintenant pour afficher le contenu du formulaire, notre page cible va exécutée le code PHP qu'on a écrit pour récupérer les données dans le serveur. Le serveur va parcourir tous les messages enregistrés pour arriver à celui de l'utilisateur malveillant qui contient un `script alert('boom')`. PHP génère du code HTML qui va être lu par le navigateur et qui va lire et exécuter le script.
+
+    ``` 
+        <?php   
+        if (
+            (!isset($_GET['email']) || !filter_var($_GET['email'], FILTER_VALIDATE_EMAIL)) 
+            || (!isset($_GET['message']) || empty($_GET['message']))
+            ){
+        
+            echo('Il faut un email et un message pour soumettre le formulaire.');
+            
+            return;
+        }
+        ?>
+        <div class="card">
+            
+            <div class="card-body">
+                <h5 class="card-title">Rappel de vos informations</h5>
+                <p class="card-text"><b>Email</b> : <?php echo $_GET['email']; ?></p>
+                <p class="card-text"><b>Message</b> : <?php echo $_GET['message']; ?></p>
+            </div>
+        </div>
+    ```
+Le script est exécuté par le navigateur: 
+![Capture d'image superGlobal](https://i.ibb.co/NYKbSvG/boom.png)
+    
+Maintenant on va améliorer notre code avec la fonction `strip_tags`. Elle supprime les balises script dans le message reçu de l'utilisateur et le navigateur l'intépretera comme du texte simple.
+
+    ``` 
+        <?php   
+        if (
+            (!isset($_GET['email']) || !filter_var($_GET['email'], FILTER_VALIDATE_EMAIL)) 
+            || (!isset($_GET['message']) || empty($_GET['message']))
+            ){
+        
+            echo('Il faut un email et un message pour soumettre le formulaire.');
+            
+            return;
+        }
+        $message = $_GET['message'];
+        ?>
+        <div class="card">
+            
+            <div class="card-body">
+                <h5 class="card-title">Rappel de vos informations</h5>
+                <p class="card-text"><b>Email</b> : <?php echo $_GET['email']; ?></p>
+                <p class="card-text"><b>Message</b> : <?php echo strip_tags($message); ?></p>
+            </div>
+        </div>
+    ```
+Il est possible que le script soit envoyé dans des balises HTML. Il existe une fonction `htmlspecialchars` qui transforme les chevrons des balises et les affichent au lieu de les exécutés. 
+
