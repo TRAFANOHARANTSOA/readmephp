@@ -1228,4 +1228,6 @@ Testons!
         ?>
         ```
 
-        
+En production, il faut bien s'assurer que le serveur ait les droits (733) d'écrire dans le fichier `Uploads` pour téléverser les fichiers. 
+
+Il faudrat penser à gérér les problèmes des accents, espaces dans les noms de fichiers. L'envoi de noms existants qui écrasent ceux dans le serveurs. En général, on met en place un système de nom de fichier à incrémentation (1.png, 2.jpg, 3.png, etc) par exemple pour éviter ce genre de problème. Cela suppose que lo nom d'origine n'est pas pris en compte.
