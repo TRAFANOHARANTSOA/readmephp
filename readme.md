@@ -1195,7 +1195,7 @@ Ce code est beaucoup plus simple qu'il n'y parraît. La variable `$fileinfo` ré
         ?>
         ```
     
-Dans cette dernière de la validation, si tout est bon on accepte le fichier. On utilise `move_uploaded_file()` qui déplace le fichier du répertoire temporaire de stockage vers un répértoire définitif que nous allons créés. Comment on opère?
+Dans cette dernière de la validation, si tout est bon on accepte le fichier. On utilise `move_uploaded_file()` qui déplace le fichier du répertoire temporaire de stockage vers un répértoire définitif que nous allons créés, `uploads` pour notre exemple. Comment on opère?
 
 Et bien, `move_uploaded_file()` prend deux paramètres :
 1. le chemin qui est le nom temporaire du fichier, cette information se trouve dans `$_FILES['screenshot']['tmp_name']`.
