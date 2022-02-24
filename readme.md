@@ -1131,6 +1131,7 @@ Le contrôle sur l'extension du fichier autorisé est important car si on laisse
 Testons tout cela!
 
 **TEST n°1 :**
+
     ```
         <?php
         // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
