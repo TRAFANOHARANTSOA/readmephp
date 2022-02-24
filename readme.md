@@ -613,7 +613,7 @@ if (array_key_exists('commentaires', $recipe))
 Seule la première condition est vraie, l’autre ne fait rien.
 
 #### Vérifier si une valeur existe dans un tableau avec `in_array ` :
-Cette fonction va parcourir le tableau et vérifie les valeur. Il est combiné avec la condition `if`.
+Cette fonction va parcourir le tableau et vérifie les valeurs. Il est combiné avec la condition `if`.
 Il renvoi un type booléen :
 1.	`true` si la valeur est dans le tableau
 2.	`false` si la valeur ne se trouve pas dans le tableau
@@ -631,7 +631,7 @@ if (in_array('John Doe', $users))
     echo John fait bien partie des utilisateurs enregistrés !';
 }
 
-if (in_array('Jhonny Depp', $users))
+if (in_array('Jhonny Doe', $users))
 {
     echo 'Johnny fait bien partie des utilisateurs enregistrés !';
 }
@@ -1114,3 +1114,30 @@ Ce fichier est envoyé au serveur qui le stock temporairement. C'est à nous de 
 
 Dans la page cible `submit_contact.php`, on vas vérifier si le fichier a la bonne extension sinon, il sera refuser. Si oui, il sera accépter définitivement grâce à la fonction `move_uploaded_file`
 
+### Sécurisation du fichier
+Avant de l'accépter, le fichier doit être vérifié. Pour le faire nous devons récupérer les informations sur ce fichier.
+Il faut savoir que pour chaque fichier envoyé, une variable `$_FILES['nom_du_champ']` est créée. Dans notre exemple il s'agit de `$_FILES['screenshot']`. Si votre formulaire contient plusieurs champs (input) pour envoyer des fichiers, il aura autant de variable `$_FILES['nom_du_chamm_concérné']`. Cette variable `$_FILES` est un tableau qui contient les informations sur chaque fichier. Regardons le tableau ci dessous.
+
+
+![Capture d'image superGlobal](https://i.ibb.co/b6TtGqH/FILES.png)
+
+On va se baser sur ces informations pour faire les vérifications suivantes :
+1. si le fichier a bien été envoyé : on applique `isset()` sur la variable `$_FILES['screenshot']` pour savoir il existe et `$_FILES['screenshot']['error']` pour savoir si il n'y a pas eu d'erreur d'envoi.
+2. si la taille du fichier ne dépasse pas mettons 3 Mo : on fait un test sur `$_FILES['screenshot']['size']`.
+3. si l'extension du fichier est autorisée : on fait un test sur `$_FILES['screenshot']['name']`. Dans notre exemple nous autorisons uniquement les images (.png, .jpeg, .jpg, .gif).
+
+Le contrôle sur l'extension du fichier autorisé est important car si on laisse les gens nous envoyés des fichier php, ils pourraient exécuter des scripts sur notre serveur).
+
+Testons tout cela!
+
+**TEST n°1 :**
+    ```
+        <?php
+        // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
+        if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
+        {
+        
+        }
+        ?>
+    ```
+**TEST n°2 :**
