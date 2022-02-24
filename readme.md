@@ -1126,19 +1126,106 @@ On va se baser sur ces informations pour faire les vérifications suivantes :
 2. si la taille du fichier ne dépasse pas mettons 3 Mo : on fait un test sur `$_FILES['screenshot']['size']`.
 3. si l'extension du fichier est autorisée : on fait un test sur `$_FILES['screenshot']['name']`. Dans notre exemple nous autorisons uniquement les images (.png, .jpeg, .jpg, .gif).
 
-Le contrôle sur l'extension du fichier autorisé est important car si on laisse les gens nous envoyés des fichier php, ils pourraient exécuter des scripts sur notre serveur).
+**Le contrôle sur l'extension du fichier autorisé est important car si on laisse les gens nous envoyés des fichier PHP, ils pourraient exécuter des scripts sur notre serveur).**
 
 Testons tout cela!
 
-**TEST n°1 :**
+**TEST n°1 + TEST n°2**
 
     ```
         <?php
         // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
         if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
         {
+                // Testons si le fichier n'est pas trop gros
+                if ($_FILES['screenshot']['size'] <= 1000000)
+                {
         
+                }
         }
         ?>
     ```
-**TEST n°2 :**
+**TEST n°3 :**
+
+    ```
+        <?php
+        // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
+        if (isset($_FILES['screenshot']) AND $_FILES['screenshot']['error'] == 0)
+        {
+                // Testons si le fichier n'est pas trop gros
+                if ($_FILES['screenshot']['size'] <= 1000000)
+                {
+                        // Testons si l'extension est autorisée
+                        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                        $extension = $fileInfo['extension'];
+                        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                        if (in_array($extension, $allowedExtensions))
+                        {
+                        
+                        }
+                }
+        }
+        ?>
+    ```
+
+Ce code est beaucoup plus simple qu'il n'y parraît. La variable `$fileinfo` récupère le contenu de la fonction `pathinfo()`. Cette dernière retourne un tableau associatif des éléments suivants, `['Dirname','Basename','Extension','Filename']`. Après on récupère dans `$extension` l'extension du fichier. On crée un tableau des extensions autorisées dans `$allowedExtensions`. On vérifie avec `in_array()` si l'extension contenu dans `$extension` existe dans `$allowedExtensions`. Si oui on passe à la validation de l'upload du fichier dans le test n°4.
+
+**TEST n°4 :**
+
+        ```
+        <?php
+        // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
+        if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
+        {
+                // Testons si le fichier n'est pas trop gros
+                if ($_FILES['screenshot']['size'] <= 1000000)
+                {
+                        // Testons si l'extension est autorisée
+                        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                        $extension = $fileInfo['extension'];
+                        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                        if (in_array($extension, $allowedExtensions))
+                        {
+                                // On peut valider le fichier et le stocker définitivement
+                                move_uploaded_file($_FILES['screenshot']['tmp_name'], 'uploads/' . basename($_FILES['screenshot']['name']));
+                                echo "L'envoi a bien été effectué !";
+                        }
+                }
+        }
+        ?>
+        ```
+    
+Dans cette dernière de la validation, si tout est bon on accepte le fichier. On utilise `move_uploaded_file()` qui déplace le fichier du répertoire temporaire de stockage vers un répértoire définitif que nous allons créés. Comment on opère?
+
+Et bien, `move_uploaded_file()` prend deux paramètres :
+1. le chemin qui est le nom temporaire du fichier, cette information se trouve dans `$_FILES['screenshot']['tmp_name']`.
+2. le chemin qui est le nom de stockage définitif du fichier. Alors, on peut utiliser celui qu'on lui a donné nous même, `C:\dossier\fichier.png` par exemple et qui se trouve dans `$_FILES['screenshot']['name']`. Ou alors on peut en générer un au hasard.
+
+Pour notre exemple on va utiliser le nom d'origine contenu dans `$_FILES['screenshot']['name']`. Mais il nous faut l'extraire de là. Une fonction nommée `basename()` est disponible pour effectuer cette tâche.
+
+Testons!
+
+        ```
+        <?php
+        // Testons si le fichier a bien été envoyé et s'il n'y a pas d'erreur
+        if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] == 0)
+        {
+                // Testons si le fichier n'est pas trop gros
+                if ($_FILES['screenshot']['size'] <= 1000000)
+                {
+                        // Testons si l'extension est autorisée
+                        $fileInfo = pathinfo($_FILES['screenshot']['name']);
+                        $extension = $fileInfo['extension'];
+                        $allowedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
+                        if (in_array($extension, $allowedExtensions))
+                        {
+                                // On peut valider le fichier et le stocker définitivement
+                                move_uploaded_file($_FILES['screenshot']['tmp_name'], 'uploads/' . basename($_FILES['screenshot']['name']));
+                                echo "L'envoi a bien été effectué !";
+                        }
+                }
+        }
+        ?>
+        ```
+
+        
