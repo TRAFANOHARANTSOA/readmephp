@@ -1231,3 +1231,77 @@ Testons!
 En production, il faut bien s'assurer que le serveur ait les droits (733) d'écrire dans le fichier `Uploads` pour téléverser les fichiers. 
 
 Il faudrat penser à gérér les problèmes des accents, espaces dans les noms de fichiers. L'envoi de noms existants qui écrasent ceux dans le serveurs. En général, on met en place un système de nom de fichier à incrémentation (1.png, 2.jpg, 3.png, etc) par exemple pour éviter ce genre de problème. Cela suppose que lo nom d'origine n'est pas pris en compte.
+
+## Système de connexion pour les utilisateurs.
+L'objectif d'une connexion c'est de reconnaître l'utilisateur et de lui donner accès au contenu.Le problème à résoudre pour mettre en place ce genre de système, c'est de pouvoir protéger le contenu d'une page par un mot de passe.
+
+Comment fait on?
+Il y aura un formulaire de connexion avec email et mot de passe. On vérifie si la personne figure dans la base, si oui elle est reconnue et on lui donne l'accès aux contenus, et on lui envoi un message de bienvenue :
+>`Bonjour nom_de_l'utilisateur, bienvenu sur le site!` . 
+
+Sinon on lui demande de s'inscrire ou à notre niveau un simple message d'erreur.
+
+#### Mettre en place un système
+**Etape 1  :** Puisqu'on a pas encore de base de données, je vais créés un tableau associatif des utilisateurs contenant :
+1. une clé `mail` pour l'e-mail,
+2. une clé `password` pour le mot de passe.
+
+**Etape 2** : 
+Il nous faut trois pages, `login.php` pour le formulaire `home.php` pour le contenu. Pour l'inscription à la base, on mettra en place une troisième page  `register.php`. Mais pour le moment, travaillons sur les deux autres.
+
+Trois cas possible peuvent se produire lors de la soummission des informations du formulaire de la page `login.php` :
+
+1. L'utilisateur ne saisi rien ou laisse un champ vide : `Saisissez vos identifiants`, l'utilisateur reste sur la page de formulaire de connexion.
+2. L'utilisateur n'est pas reconnu : `Connexion impossible!`, l'utilisateur reste sur la page de formulaire de connexion.
+3. L'utilisateur est reconnu et a renseigné le bon mot de passe : `connexion réussi`, l'utilisateur est dirigé sur la page de contenu qui s'affiche.
+
+    ```
+        <?php
+                if (
+                    (!isset($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) 
+                    || (!isset($_POST['password']) || empty($_POST['password']))
+                    ){
+                            $errorConnexion = 'Saisissez vos identifiants';
+                            echo $errorConnexion; 
+                                
+                    }else{
+                            
+                            foreach($users as $user) {
+                                    if(
+                                    $_POST['email'] === $user['email'] && $_POST['password'] === $user['password']
+                                    ){  
+                                    $loggedUser [] = [
+                                            'email'=> $user['email'],
+                                    ];
+                                    $connexionSucceed = 'Connexion réussi';
+                                
+                                    }else{
+                                            $errorId = 'Connexion impossible'; 
+                                    }
+                            }
+            
+                    } 
+        ?>
+        <form action="" method="POST">  
+            <?php if(empty($loggedUser)):?>
+            <?php if(isset($errorId)):?>
+            <div class="alert alert-danger" role= ="alert"> <?php echo $errorId;?></div>
+            <?php endif;?>
+
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" placeholder="you@exemple.com">
+            </div>
+            <div>
+                <label for="message" class="form-label">Mot de passe</label>
+                <input type="password" name="password" value = '' class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Se connecter</button>
+        </form>
+        <?php else: header('Location: home.php');?>
+        <?php endif;?>
+    ```
+
+
+
+
