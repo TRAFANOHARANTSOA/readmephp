@@ -1414,5 +1414,59 @@ Voici la modification que j'ai faite à `login.php` pour activer une session :
             <?php endif;?>
         ```
 ## Concervez les données avec les cookies 
+A quelques différences près, c'est pratiquement la même chose que les sessions. Mais c'est quoi un cookie?
 
+### Fonctionnement d'un cookie
+Un **cookie** est un fichier que l'on enregistre sur l'ordinateur du visiteur. Il contient permet de retenir des informations sur ce dernier. Pratiquement, si vous avez inscrit dans un cookie son pseudo, à chaque fois que votre visiteur revient sur votre site, vous allez regardez son cookie et lire son pseudo.
+> Chaque cookie stock une information à la fois. Stocker un pseudo et son mail, c'est créer un cookie pour le pseudo et un autre pour le mail,
 
+La liste des cookies sur votre ordinateur est disponible dans votre navigateur. On peut les supprimer. Ils sont classés par site web. 
+
+**Comment écrire un cookie?**
+Un cookie a un nom et une valeur, comme une variable. On utilise la fonction PHP `setcookie` pour en écrire. On lui donne trois paramètres : 
+1. Le **nom** du cookie (exemple LOGGED_USER).
+2. La **valeur** du cookie (exemple emailuser@exemple.com)
+3. Une **date d'expiration** sous forme de "timestamp": pour être précis, c'est le nombre de seconde écoulé depuis 01/01/1970 auquel on ajout le nombre de seconde auquel on veut que notre cookie expire. Pour avoir la valeur actuelle du timestamp, on appel la fonction `time()`. Pour écrire une cookie qui expirera dans un an : `time()+ 365*24*3600`.
+
+### Sécurisez un cookie avec les propriétés `httpOnly` et `secure`
+Voici comment créer un cookie de façon sécurisée :
+    
+    ```
+            <?php
+        // retenir l'email de la personne connectée pendant 1 an
+        setcookie(
+            'LOGGED_USER',
+            'utilisateur@exemple.com',
+            [
+                'expires' => time() + 365*24*3600,
+                'secure' => true,
+                'httponly' => true,
+            ]
+        );
+    ```
+
+> Sans rentrer dans les détails, cela rendra votre cookie inaccessible en JavaScript sur tous les navigateurs qui supportent cette option (c'est le cas de tous les navigateurs récents). Cette option permet de réduire drastiquement les risques de faille XSS sur votre site, au cas où vous auriez oublié d'utiliser htmlspecialchars à un moment. Il s'agit içi de protéger vos visiteurs pour ne pas qu'il se fasse volé le contenu de son cookie. Evitez absolument de placez du code HTML avant `setcookie`.
+
+### Affichez et récupérez un cookie.
+La première tâche que PHP sur une page, c'est de lire et récupérer le contenu des cookies du client. Ces informations sont ensuite placée dans la superglobale `$_COOKIE` sous forme de tableau (`array`). 
+
+Le code pour afficher le mail de l'utilisateur dans le cookie ` Bonjour <?php echo $_COOKIE['LOGGED_USER']; ?> !`
+
+Pour tester si le cookie existe, appel la fonction `isset()`.
+>Les cookies viennent du visiteur. Comme toute information qui vient du visiteur, elle n'est pas sûre. N'importe quel visiteur peut créer des cookies et envoyer ainsi de fausses informations à votre site.
+
+### Modifier un cookie existant.
+On appel `setcookie` en gardant le même nom de cookie, ce qui « écrasera » l'ancien. Içi on modifie le mail:
+
+        ```
+            <?php
+            setcookie(
+                'LOGGED_USER',
+                'mailmodifier@exemple.com',
+                [
+                    'expires' => time() + 365*24*3600,
+                    'secure' => true,
+                    'httponly' => true,
+                ]
+            );
+        ```
