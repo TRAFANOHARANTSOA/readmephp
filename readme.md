@@ -1255,6 +1255,9 @@ Trois cas possible peuvent se produire lors de la soummission des informations d
 2. L'utilisateur n'est pas reconnu : `Connexion impossible!`, l'utilisateur reste sur la page de formulaire de connexion.
 3. L'utilisateur est reconnu et a renseigné le bon mot de passe : `connexion réussi`, l'utilisateur est dirigé sur la page de contenu qui s'affiche.
 
+Pour l'instant j'ai écrit le code comme ceci :
+Pour `login.php` :
+
     ```
         <?php
                 if (
@@ -1302,6 +1305,114 @@ Trois cas possible peuvent se produire lors de la soummission des informations d
         <?php endif;?>
     ```
 
+Pour `home.php` : 
 
+    ```
+        <form action="login.php" class="d-flex justify-content-end " >
+                <div><button type="submit" class="btn btn-danger ">Se déconnecter</button>
+                </div>
+                </form>
+                
+                <div class="d-flex justify-content-around">
+                        <?php foreach(displayAuthor($recipes,$users) as $recipe) : ?>
+                        <div class=" col-lg-2 projectcards bg-light">
+                                <div class="card-body cardbody  ">                  
+                                    <article>
+                                        <h2> <?php echo $recipe[0]; ?></h2>
+                                        <p>Auteur : <?php echo $recipe[1]; ?></p>
+                                        <p>Rôle : <?php echo $recipe[2]; ?></p>
+                                        <p>Mail : <?php echo $recipe[3]; ?></p>
+                                        <form action="edit.php" class="d-flex justify-content-start " >
+                                        <button type="submit" class="btn btn-primary ">Lire la recette</button>
+                                        </form>
+                                    </article>
+                                </div>
+                        </div>
+                        <?php endforeach ?>
+                </div>
+    ```
+Ce qui me donne ça :
+
+![Capture d'image connexion](https://i.ibb.co/dKg9pqt/connexion.png)
+
+![Capture d'image recettes](https://i.ibb.co/W03dJjb/recettesaffichages.png)
+
+
+## Concervez les données grâce aux sessions et aux cookies.
+Notre système de connexion fonctionne mais il peut être améliorer. Pour transmettre les variables de page en page, nous savons le faire avec les URL et les formulaires. Mais lorsqu'on charge une autre page, ces informations sont oubliées de la mémoire.
+C'est précisément l'intérêt des sessions, pouvoir garder nos informations pour une durée plus ou moins longue.
+> Les sessions permettent de conserver des variables sur toutes les pages de votre site. 
+
+### Fonctionnement des sessions :
+Lorsque votre utilisateur arrive sur la page de connexion à votre site par ses identifiants, session n'existe pas encore. Une fois qu'il s'est identifié, il faut lui créer une session. 
+Pour activer une session, on utilise la fonction `session_start()`. Un numéro de session est généré pour lui. Pour fermer la session, on utilise la fonction `session_destroy()`. Il est appelé automatiquement après d'un temps impartis d'inactivité (timeout) de l'utilisateur ou celui ci se déconnecte manuellement en cliquant sur un bouton "Deconnexion".
+
+Voilà ce qui se passe lors d'une session:
+
+1. **création d'une session unique** 
+- le visiteur arrive
+- on crée une session pour lui, `session_start()`
+- PHP gènère un numéro de session unique : c'est son identifiant, **ID de session** ou `PHPSESSID`.
+2. **création de variables pour la session**
+Une fois qu'elle est générée, la variable superglobale `$_SESSION` est disponible. On peut alors la remplir pour créer des variables de session. 
+- variable qui contient le nom du visiteur : `$_SESSION['nom']`
+- variable qui contient son prénom : `$_SESSION['prénom']`
+> Elles sont conservées par le serveur quelque soit la page sur laquelle vous êtes.
+3. **suppression de session**
+Il s'agit içi d'oublier les variables en détruisant la session. Généralement, on procède à cette destruction quand l'un des deux cas ci dessous se présente :
+- l'utilisateur est resté inactif pendant un temps impartis : on le déconnecte automatiquement en détruisant la session par un `timeout`
+- l'utilisateur clique sur le bouton **se déconnecter** qui détruit la session.
+
+>Il faut appeler session_start() sur chacune de vos pages AVANT d'écrire le moindre code HTML ou PHP (avant même la balise  <!DOCTYPE>  ). Si vous oubliez de lancer session_start()  , vous ne pourrez pas accéder à la variable superglobale   $_SESSION  .
+
+Voici la modification que j'ai faite à `login.php` pour activer une session : 
+
+        ```
+            <?php
+                    if (
+                        (!isset($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) 
+                        || (!isset($_POST['password']) || empty($_POST['password']))
+                        ){
+                                $errorConnexion = 'Saisissez vos identifiants';
+                                echo $errorConnexion; 
+                                    
+                        }else{
+                                
+                                foreach($users as $user) {
+                                        if(
+                                        $_POST['email'] === $user['email'] && $_POST['password'] === $user['password']
+                                        ){
+                                        
+                                        $_SESSION['LOGGED_USER'] = $user['email'];
+                                        session_start();
+                                        $connexionSucceed = 'Connexion réussi';
+                                    
+                                        }else{
+                                                $errorId = 'Connexion impossible'; 
+                                        }
+                                }
+                
+                        } 
+            ?>
+            <form action="" method="POST">  
+                <?php if(!isset($_SESSION['LOGGED_USER'])):?>
+                <?php if(isset($errorId)):?>
+                <div class="alert alert-danger" role= ="alert"> <?php echo $errorId;?></div>
+                <?php endif;?>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" aria-describedby="email-help" placeholder="you@exemple.com">
+                </div>
+                <div>
+                    <label for="message" class="form-label">Mot de passe</label>
+                    <input type="password" name="password" value = '' class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+            <?php else: header('Location: home.php');?>
+            <?php endif;?>
+        ```
+## Concervez les données avec les cookies 
 
 
