@@ -1486,7 +1486,7 @@ MySQL offre une large quantité de type de données. Généralement, quatres d'e
 **Les clés primaires**
 Les clés primaires doivent être définies pour toutes les tables d'une base. Elle permet d'identifier de manière unique une entrée dans la table. Dans la plus part des cas, `id` est utilisée comme clé primaire. Pour définir en clé primaire, on lui donne l'index `PRIMARY`. L'attribut de ce champ est généralement en `AUTO_INCREMENT` (1,2,3,4...) pour gérer les nouvelles entrées.
 
-Un fois la base de donnée disponible, nous allons y accéder depuis notre application grâce à PHP.
+Un fois la base de donnée disponible, nous allons y accéder depuis notre application grâce à PHP. On peut déjà se dire que les tableaux de recettes et d'utilisateurs que nous avons créés dans le fichier `variables.php` sont inutiles puisqu'on vas direcement intéragir avec notre base qui contient ces tableaux.
 
 ## Connexion à la base de données en PHP avec PDO.
 Avant de pouvoir manipuler les données, on doit établir la connexion entre PHP et MySQL. En réalité on souhaite se connecter à notre base de données qui est diponible dans MySQL. On utilise une extension orientée objet de PHP nommé PDO (PHP Data Objects).
@@ -1556,7 +1556,7 @@ Maintenant qu'on est connécté, on vas apprendre à manipuler les données avec
 SQL est le langage commun aux bases de données. Il nous permet de communiquer avec MySQL.
 Voici une requête SQL simple pour récupérer le contenu d'une table :
 
-````
+```
 SELECT * FROM  table // nom de la table que j'ai créée) 
 ```
 
@@ -1581,7 +1581,7 @@ Nous venons de réer un objet appellé `PDOStatement` dans la variable `$tableSt
 ```
 Nos données sont exploitables maintenant. Détaillons tout le processus.
 
-    ```
+        ```
         <?php
         // on gère les exception lors de la connexion
         try
@@ -1610,5 +1610,100 @@ Nos données sont exploitables maintenant. Détaillons tout le processus.
         <?php
         }
         ?>
-    ```
+        ```
+
+### Filtrer les données 
+ Dans notre exemple d'application de recettes, nous avons affichés nos recettes valides et avec leurs auteurs en écrivant des fonctions PHP. Maintenant qu'on a une base, on peut le faire en requête SQL. Il existe plusieurs mots clés SQL pour filtrer et trier les données.
+ Nous allons voir `WHERE` qui filtre les données selon que la valeur d'un champ d'une table respecte les conditions que l'on souhaite. La fonctionnalité phpMyAdmin qui permet de tester des requêtes se trouve dans l'onglet `SQL` du logiciel. On peut tester nos requêtes et les copiés dans le code si elles fonctionnent correctement. 
+ Dans notre cas pour les recettes valides avec leurs auteurs :
+
+ ``` 
+ SELECT title, recipe, author FROM recipes WHERE is_enabled = TRUE;
+ ```
+
+ >Ce qu'on vient de faire c'est de remplacer la fonction `isValideRecipe` que nous avons écris pour récupérer les recettes valides dont les valeurs du champ `is_enabled = true` par une requête SQL. Dans le fichier `function.php`, j'ai commenté ma fonction `isValideRecipe` car elle est caduque. J'ai également commenté dans la fonction `getRecipes` la condition sur `isValideRecipe`.
+
+ On peut en conclure que la base de données nous simplifie la vie non ? :smiley:
+
+Il existe d'autres mots clés tel que `ORDER BY, LIMIT, AND, etc` que je verrais dans un autre cours sur MySQL.
+
+### Construire des requêtes en fonctions de variables 
+Pour illustrer ce que je vais faire, prenons l'exemple la requête ci dessous :
+`SELECT title FROM recipes WHERE email = 'John.nom@exemple.com'`
+Cette requête toujours la même opération. Mais imaginons qu'à la place de la valeur du champ `email` on utilise une variable PHP qui va récupérer des données dans une URL ($_GET['email]) ou formulaire ($_POST['email']). Nous aurons un système dynamique de requête. **Mais on ne peut passer des variables PHP telles qu'elles dans une requête au risque de créer une faille de sécurité. il faut passer par les marqueurs que PDO reconnaît lors de la préparation de la requête et remplace par des variables nommées ou anonymes.**
+
+### Identifiez les variables à l'aide de marqueurs
+Au moment de la **préparation** de la requête, PDO reconnais des identifiants que l'on appels marqueurs et les remplaces par des variables anonymes ou nommées.
+1. variables anonymes (non nommées) : on utiliser le marqueur `?` que PDO reconnaîtra et remplacera. Dans le code ci-dessous, j'ai remplacé la valeur du champ `author` dans la requête par la valeur de la variable `$_SESSION['LOGGED_USER']` pour avoir les recettes de l'utilisateur connecté.
+
+        ```
+        <?php
+        // on gère les exception lors de la connexion
+        try
+        {
+            // On se connecte à MySQL
+            $mysqlClient = new PDO('mysql:host=localhost;dbname=my_recipes;charset=utf8', 'root', 'root');
+        }
+        catch(Exception $e)
+        {
+            // En cas d'erreur, on affiche un message et on arrête tout
+                die('Erreur : '.$e->getMessage());
+        }
+
+        // Si tout va bien, on peut continuer
+
+        // On récupère tout le contenu de la table recipes
+        if(isset($S_SESSION['LOGGED_USER'])){
+        $sqlQuery = 'SELECT * FROM recipes WHERE author = ? '; // on met la requête dans une variable
+        $recipesStatement = $mysqlClient->prepare($sqlQuery)//; // on prépare PDOStatement
+        
+        $recipesStatement->execute([$_SESSION['LOGGED_USER']]); // on exécute la requête dans PDOStatement
+        $recipes = $recipesStatement->fetchAll(); // on récupère les données sous forme de tableau
+        
+        }
+        // On affiche chaque recette une à une
+        foreach ($recipes as $recipe) {
+        ?>
+            <p><?php echo $recipe['author']; ?></p>
+        <?php
+        }
+        ?>
+        ```
+
+2. variables nommées : si on a beaucoups d'arguments à insérer dans la requête, il vaut mieux utiliser les variables nommées. Dans ce cas on aura un tableau associatif dans `execute()`. On utilise un `:` pour marquer les arguments à passer à la requête. Voyez plutôt :  
+
+        ```
+        <?php
+        // on gère les exception lors de la connexion
+        try
+        {
+            // On se connecte à MySQL
+            $mysqlClient = new PDO('mysql:host=localhost;dbname=my_recipes;charset=utf8', 'root', 'root');
+        }
+        catch(Exception $e)
+        {
+            // En cas d'erreur, on affiche un message et on arrête tout
+                die('Erreur : '.$e->getMessage());
+        }
+
+        // Si tout va bien, on peut continuer
+
+        // On récupère tout le contenu de la table recipes
+        if(isset($_SESSION['LOGGED_USER'])){
+        $sqlQuery = ' SELECT title, recipe, author FROM recipes WHERE author = :author AND is_enabled = :is_enabled';
+        $recipesStatement = $mysqlConnection->prepare($sqlQuery);
+        
+        $recipesStatement->execute([
+                'author' => $_SESSION['LOGGED_USER'],
+                'is_enabled' => 1,
+        ]);
+        // On affiche chaque recette une à une
+        foreach ($recipes as $recipe) {
+        ?>
+            <p><?php echo $recipe['author']; ?></p>
+        <?php
+        }
+        ?>
+        ```
+
 
