@@ -1470,3 +1470,145 @@ On appel `setcookie` en gardant le même nom de cookie, ce qui « écrasera » l
                 ]
             );
         ```
+
+## Conception d'une base de données PHP/MySQL
+Pour communiquer avec notre système de gestion de base de donnée MySQL, nous allons utilisé le logiciel PHPMYADMIN. C'est un outil qui nous permet de visualiser rapidement l'état de notre base de données et de la modifier, sans avoir à écrire de requêtes SQL. Ce langage est celui de tous les systèmes de gestion de base de données (avec quelques petites différences néanmoins pour certaines fonctionnalités plus avancées).Notre base de données sera constitué de la base en elle même, de tables, de champs (colonnes) et des données en entrées (lignes).
+
+Je vais faire l'impasse sur la création de table ou les imports/export de données, bref l'utilisation de phpMyAdmin. Néanmoins, quelques notions sont importantes, notamment :
+
+**Les types de données ou type de champs de MySQL**
+MySQL offre une large quantité de type de données. Généralement, quatres d'entre elles couvrent la majorité nos besoins :
+1. `INT` : nombre entier
+2. `VARCHAR` : caractères courtes de 1 à 256.
+3. `TEXTE` : texte long 
+4. `DATE` : pour les dates (j/m/a).
+
+**Les clés primaires**
+Les clés primaires doivent être définies pour toutes les tables d'une base. Elle permet d'identifier de manière unique une entrée dans la table. Dans la plus part des cas, `id` est utilisée comme clé primaire. Pour définir en clé primaire, on lui donne l'index `PRIMARY`. L'attribut de ce champ est généralement en `AUTO_INCREMENT` (1,2,3,4...) pour gérer les nouvelles entrées.
+
+Un fois la base de donnée disponible, nous allons y accéder depuis notre application grâce à PHP.
+
+## Connexion à la base de données en PHP avec PDO.
+Avant de pouvoir manipuler les données, on doit établir la connexion entre PHP et MySQL. En réalité on souhaite se connecter à notre base de données qui est diponible dans MySQL. On utilise une extension orientée objet de PHP nommé PDO (PHP Data Objects).
+
+Il faut activer cette extension si ce n'est pas déjà fait. Pour le vérifier, accéder à votre page phpinfo(). Lancer une recherche (ctrl+f) sur "PDO", naviguer jusqu'à ce que vous trouviez la partie ou le `PDO SUPPORT est enabled` avec les driver `mysql, sqlite`. 
+
+![Capture d'image recettes](https://i.ibb.co/d03MmV4/active-PDO.png)
+
+Si ce n'est pas le cas, aller dans le fichier `php.ini`, ouvrer le avec un éditeur de texte. Lancer une recherche PDO, naviguer jusqu'à la liste des extensions qui sont activés. Si devant `extension=php_pdo_sqlite.dll` &  `extension=php_pdo_mysql.dll`, sont commentés (avec un `;` devant), décommenter les (enlever le `;`).
+
+![Capture d'image recettes](https://i.ibb.co/JQ0yM7Y/extensionpdo.png)
+
+Voilà on vas pouvoir rentrer dans le vif.
+
+### Connectez PHP à MySQL avec PDO 
+Pour créer la connexion, on donne comme valeur à une variable qu'on va nommer`$db` un objet `new PDO()` qu'on initie. on passe des paramètres à PDO dans l'ordre suivant :
+1. Le premier paramètre s'appelle le `DSN : Data Source Name`, il commence par `mysql`. C'est généralement le seul qui change en fonction du type de base de données auquel on se connecte. Ce paramètre possèdent d'autres paramètres auxquelles on donne des valeurs. Les deux principaux paramètres sont :
+    - le nom d'hote: localhost; (parce que mysql et php sont sur le même ordinateur)
+    - la base de données : c'est le nom de la base qu'on a créée.
+
+On peut par exemple paramétrer le code caractère à utiliser, `charset=utf8`.
+
+2. l'identifiant (login): root;
+3. le mot de passe :  pas de mot de passe sous wamp (je suis sous wamp).
+Dans notre cas, on se connecte à une base en locale. Lorsque vous mettez votre site en ligne les paramètres changent. Il faudra renseigner les informations de votre hébergeur.
+Voici le code :
+
+    ```
+        <?php
+        // Souvent on identifie cet objet par la variable $conn ou $db
+        $mysqlConnection = new PDO(
+            'mysql:host=localhost;dbname=my_recipes;charset=utf8',
+            'root',
+            'root'
+        );
+        ?>
+    ```
+
+### Gérer les exceptions (test d'erreurs)
+A ce stade, si tout se passe bien PHP affiche une page blanche. Lors de la connexion, si une erreur se produit (mot de passe erroné etc), PHP  risque d'afficher toute la ligne qui poose problème, mot de passe inclut. Auquel cas si votre site est en ligne, vos utilisateurs le verrons.Sur l'image en dessous j'ai fait exprés de renseigner un mot de passe. N'oublions pas, je suis sur wamp donc le mot de passe est vide pour `root`.
+
+![Capture d'image errorconnexion](https://i.ibb.co/Fnz9tqz/connexionerror.png)
+
+Pour gérer les erreurs, `PDO` renvoie ce qu'on appelle une `exception`, qui permet de capturer l'erreur. Le code écrit ci-dessous utilise la fonctionnalité programmation orienté objet de de PHP.
+
+        ```
+            <?php
+            try
+            {
+                $db = new PDO('mysql:host=localhost;dbname=my_recipes;charset=utf8', 'root', 'root');
+            }
+            catch (Exception $e)
+            {
+                    die('Erreur : ' . $e->getMessage());
+            }
+            ?>
+
+        ```
+En gros, PHP essai d'exécuter les instructions dans le bloc `try`: 
+
+--> Si une erreur se produit, il rentre dans le bloc `catch` et fait ce qu'on lui demande.
+--> Sinon PHP ignore les instructions du bloc `catch`
+
+Maintenant qu'on est connécté, on vas apprendre à manipuler les données avec des requêtes SQL.
+
+### Ecrire des requêtes SQL
+SQL est le langage commun aux bases de données. Il nous permet de communiquer avec MySQL.
+Voici une requête SQL simple pour récupérer le contenu d'une table :
+
+````
+SELECT * FROM  table // nom de la table que j'ai créée) 
+```
+
+`SELECT` : indique à SQL l'opération à effectuer en l'occurence d'afficher ce que contient une table,
+`*` : il s'agit des champs à récupérer, içi j'ai récupéré tous les champs ou des champs bien précis `SELECT champs1, champs2 FROM table`,
+`FROM` : la table cible de la requête. C'est une liaison entre les noms des champs et le nom de la table,
+`table` : nom de la table dans laquelle on pioche.
+Et puisque nous avons la fonctionnalité PDO de PHP, ecrivons cette requête en à l'aide de l'objet PDO :
+
+```
+    <?php
+        $tableStatement => $db->prepare('SELECT * FROM table');
+    ?>
+```
+Nous venons de réer un objet appellé `PDOStatement` dans la variable `$tableStatement'. Il faut ensuite demander à cet objet d'exécuter la requête qui se trouve à l'intérieur. Toutefois, PDOStatement est inexploitable directement. Il faut donc lui demander de récupérer les données sous forme de tableau. 
+
+```
+    <?php
+    $recipesStatement->execute();
+    $recipes = $recipesStatement->fetchAll(); // 
+    ?>
+```
+Nos données sont exploitables maintenant. Détaillons tout le processus.
+
+    ```
+        <?php
+        // on gère les exception lors de la connexion
+        try
+        {
+            // On se connecte à MySQL
+            $mysqlClient = new PDO('mysql:host=localhost;dbname=my_recipes;charset=utf8', 'root', 'root');
+        }
+        catch(Exception $e)
+        {
+            // En cas d'erreur, on affiche un message et on arrête tout
+                die('Erreur : '.$e->getMessage());
+        }
+
+        // Si tout va bien, on peut continuer
+
+        // On récupère tout le contenu de la table recipes
+        $sqlQuery = 'SELECT * FROM recipes'; // on met la requête dans une variable
+        $recipesStatement = $mysqlClient->prepare($sqlQuery)//; // on prépare PDOStatement
+        $recipesStatement->execute(); // on exécute la requête dans PDOStatement
+        $recipes = $recipesStatement->fetchAll(); // on récupère les données sous forme de tableau
+
+        // On affiche chaque recette une à une
+        foreach ($recipes as $recipe) {
+        ?>
+            <p><?php echo $recipe['author']; ?></p>
+        <?php
+        }
+        ?>
+    ```
+
