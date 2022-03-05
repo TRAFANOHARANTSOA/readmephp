@@ -1877,3 +1877,5 @@ Comme on le sait, détruite est le plus facile que construire, ce bout de code r
         }
         ?> 
     ```
+
+Je clos cet exercice sur ce point.
