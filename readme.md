@@ -1705,5 +1705,155 @@ Au moment de la **préparation** de la requête, PDO reconnais des identifiants 
         }
         ?>
         ```
+### Implementez un système INSERT, UPDATE, DELETE 
+Pour notre application des recettes, si on veut que nos utilisateurs puissent contribuer, il vous faut mettre en place un système d'ajout, modification ou suppression de recettes.
+#### Ajoutez une recette avec l'instruction `INSERT INTO`
+Ce mot clé à insérer dans nos requêtes sert à ajouter une entrée dans une table. Il faut renseigner un nom de table suivi des champs à remplir et un autre mot clé `VALUES` pour donner les valeurs aux champs dans l'ordre indiqué précédement. Si on combine le tout avec ce qu'on a vu avec les variables nommées, le code est comme ceci :
 
+        ```
+            <?php
+            try
+            {
+                $db = new PDO('mysql:host=localhost;dbname=my_recipes;charset=utf8', 'root', ' ');
+            }
+            catch (Exception $e)
+            {
+                    die('Erreur : ' . $e->getMessage());
+            }
 
+            // Ecriture de la requête
+            $sqlQuery = 'INSERT INTO recipes(title, recipe, author, is_enabled) VALUES (:title, :recipe, :author, :is_enabled)';
+
+            // Préparation
+            $insertRecipe = $mysqlClient->prepare($sqlQuery);
+
+            // Exécution ! La recette est maintenant en base de données
+            $insertRecipe->execute([
+                'title' => 'Cassoulet',
+                'recipe' => 'Etape 1 : Des flageolets ! Etape 2 : Euh ...',
+                'author' => 'contributeur@exemple.com',
+                'is_enabled' => 1, // 1 = true, 0 = false
+            ]);
+        ```
+
+Bien évidement, il faut une vue pour voir ce que fait ce code, moi j'ai crée une page qui s'appelle 'myrecipes.php' qui regroupe mes recettes. Elles sont aussi toutes visibles dans la page "home.php".
+
+Passon à la fonctionnalité "modifier une recette enregistrée".
+
+#### Modifier une recette avec l'instruction `UPDATE SET WHERE` :
+1. Pour écrire un code simple de mise à jour, je récupère l'identifiant d'une recette dans la base pour pouvoir l'éditer dans un formulaire avec ce qu'elle contient. Depuis ma page `myrecipes.php`, je fais une requête sur toutes les recettes que j'ai créé. 
+
+    ```
+        <?php   
+    $connexionSucceed = 'Vous etes connectez';
+        if(isset($_SESSION['LOGGED_USER'])){
+            $sqlQuery = ' SELECT recipe_id, title, recipe, author FROM recipes WHERE author = :author AND is_enabled = :is_enabled';
+            $recipesStatement = $mysqlConnection->prepare($sqlQuery);
+            $recipesStatement->execute([
+                    'author' => $_SESSION['LOGGED_USER'],
+                    'is_enabled' => 1,
+            ]);
+            $recipes = $recipesStatement->fetchAll();
+        }else{
+            header('Location: login.php');
+        }
+        ?>   
+    ```
+Ensuite, j'envoi dans un lien l'identifiant vers une page `update.php`, que j'ai créé au prélable. 
+
+    ```
+        <div class="d-flex justify-content-around">
+                    <?php foreach(displayAuthor($recipes,$users) as $recipe) : ?>
+                    <div class=" col-lg-2 projectcards bg-light">
+                            <div class="card-body cardbody  ">                  
+                                <article>
+                                    <h2> <?php echo $recipe[0]; ?></h2>
+                                    <p>Auteur : <?php echo $recipe[1]; ?></p>
+                                    <p>Rôle : <?php echo $recipe[2]; ?></p>
+                                    <p>Mail : <?php echo $recipe[3]; ?></p>
+                                    <a href ="update.php?id=<?php echo $recipe[5] ?>" class="btn btn-primary ">Modifier</a> 
+                                </article>
+                            </div>
+                    </div>
+                                
+                    <?php endforeach ?>
+            </div>
+    ```
+Dans ma page `update.php`, je récupère l'id par la méthode `GET`. Je passe cette valeur dans une variable anonyme pour sélectionner dans la base la recette identifiée avec une requête `SELECT`.
+
+        ```        <?php   
+                if(isset($_GET['id']) && !empty($_GET['id'])){
+                // Si tout va bien, on peut continuer
+                // On récupère tout le contenu de la table recipes
+                $sqlQuery =  "SELECT * FROM `recipes` WHERE `recipe_id` = ?";
+                $recipesStatement = $mysqlConnection->prepare($sqlQuery);
+                $recipesStatement->execute([$_GET['id']]);
+                $recipes = $recipesStatement->fetchAll();      
+                require_once("db-disconnect.php");
+                }
+                ?> 
+        ```
+
+J'affiche la recette dans un formulaire contenant les valeurs actuelles que je souhaite modifiées : 
+
+    ```    
+            <form action="" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name = 'recipe_id' value="<?= $recipes[0]['recipe_id'] ?>" >
+            <div>
+                <label for="text" class="form-label">Titre de la recette</label>
+                <input type="text" name="title" value="<?php echo $recipes[0]['title'] ?>" class="form-control">
+            </div>
+            <div>
+                <label for="text" class="form-label">Recette</label>
+                <input type="text" value="<?php echo $recipes[0]['recipe'] ?>"  name="recipe" class="form-control"></input>
+            </div>
+            <div>
+                <label for="text" class="form-label">Votre mail</label>
+                <input type="text" name="author" value="<?php echo $recipes[0]['author'] ?>" class="form-control">
+            </div>
+            <div>
+            <label for="text" class="form-label">Visibilité</label>
+            <select class="form-select form-control" aria-label="Default select example" name='is_enabled'>
+                <option value="1">Afficher la recette</option>
+                <option value="0">Cacher la recette</option>
+            </select>
+            <button type="submit" class="btn btn-primary ">Envoyer</button>
+            <a href ="myrecipes.php" class="btn btn-primary ">Mes recettes</a>
+        </form>
+    ```
+Je vérifie ensuite que `$_POST` existe et n'est pas vide. Je nettoie les informations de toutes balises que je ne souhaite pas avoir.
+Ensuite je fais une requête préparée avec les mots clés `UPDATE SET WHERE` et `prepare()`. J'associe les valeurs aux champs avec `bindValue()` et j'execute.
+        
+    ```        
+            <?php
+            if(    isset($_POST) && !empty($_POST)
+                && isset($_POST['title']) && !empty($_POST['title'])
+                && isset($_POST['recipe']) && !empty($_POST['recipe'])
+                && isset($_POST['author']) && !empty($_POST['author'])
+                && isset($_POST['is_enabled']) && !empty($_POST['is_enabled'])
+                && isset($_POST['recipe_id']) && !empty($_POST['recipe_id'])
+                ){
+                    // je nettoie les informations reçues de POST
+                    $id = strip_tags($_POST['recipe_id']);
+                    $title = strip_tags($_POST['title']);
+                    $recipe = strip_tags($_POST['recipe']);
+                    $author = strip_tags($_POST['author']);
+                    $isenabled = strip_tags($_POST['is_enabled']);
+                                    // Ecriture de la requête
+                    $sqlQuery = 'UPDATE `recipes` SET `title`= :title, `recipe`= :recipe, `author`= :author, `is_enabled`= :is_enabled WHERE `recipe_id` = :recipe_id;';
+            
+                    // Préparation
+                    $insertRecipe = $mysqlConnection->prepare($sqlQuery);
+
+                    // On va utiliser bindValue pour associer les valeurs aux champs
+                    $insertRecipe->bindValue(':title',$title , PDO::PARAM_STR);
+                    $insertRecipe->bindValue(':recipe',$recipe , PDO::PARAM_STR);
+                    $insertRecipe->bindValue(':author',$author , PDO::PARAM_STR);
+                    $insertRecipe->bindValue(':is_enabled', $isenabled , PDO::PARAM_INT);
+                    $insertRecipe->bindValue(':recipe_id',$id, PDO::PARAM_INT);
+                    // Exécution ! La recette est maintenant en base de données
+                    $insertRecipe->execute();
+
+                    }
+        ?>
+    ```
