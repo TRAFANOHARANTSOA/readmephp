@@ -1857,3 +1857,23 @@ Ensuite je fais une requête préparée avec les mots clés `UPDATE SET WHERE` e
                     }
         ?>
     ```
+
+
+Comme on le sait, détruite est le plus facile que construire, ce bout de code réduit à néant avec `DELETE FROM WHERE` tout ce qu'on vient de mettre en place. On récupère l'identifian envoyée dans l'URL depuis la page `myrecipes.php` et on effectue la requête :
+
+       
+    ``` 
+        <?php  
+        if(isset($_GET['id']) && !empty($_GET['id'])){
+       $connexionSucceed = 'Vous etes connectez';
+        // Si tout va bien, on peut continuer
+
+        // On récupère tout le contenu de la table recipes
+        $sqlQuery =  "DELETE FROM `recipes` WHERE `recipe_id` = ?";
+        $recipesStatement = $mysqlConnection->prepare($sqlQuery);
+        $recipesStatement->execute([$_GET['id']]);  
+        require_once("db-disconnect.php");
+        header('Location: myrecipes.php');
+        }
+        ?> 
+    ```
