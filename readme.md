@@ -1877,7 +1877,10 @@ Comme on le sait, détruite est le plus facile que construire, ce bout de code r
         }
         ?> 
     ```
-
+## Les jointures SQL
+Il en existe plusieurs mais les deux prinicpaux que j'ai utilisé sont les **jointures internes et externes**.
+1. Les jointures internes : elles ne sélectionnent que les données qui ont une correspondance entre les deux tables.
+2. Les jointures externes : elles sélectionnent toutes les données, même si certaines n'ont pas de correspondance dans l'autre table.
 J'ai tésté les jointures dans ce bout de code. J'ai utilisé une jointure externe pour avoir le nom de l'utilisateur qui a écrit la recette. Ces deux informations sont récupérées de la table `users` et `recipes`. Je n'ai pas créé de clé secondaire, j'ai juste chérché une correspondance entre les deux tables et cela se situe au niveau de leur champ d'email respectif soit `email` et `author`.
 
     ```
@@ -1894,4 +1897,12 @@ J'ai tésté les jointures dans ce bout de code. J'ai utilisé une jointure exte
         ?> 
         <?php include_once ('footer.php')?>
     ```
-Je clos cet exercice sur ce point.
+## Les fonctions SQL
+Les fonctions SQL peuvent être classées en deux catégories :
+
+1. Les fonctions scalaires : elles agissent sur chaque entrée. Par exemple, vous pouvez transformer en majuscules la valeur de chacune des entrées d'un champ.
+
+2. Les fonctions d'agrégat : lorsque vous utilisez ce type de fonctions, des calculs sont faits sur l'ensemble de la table pour retourner une valeur. Par exemple, calculer la moyenne des prix retourne une valeur : le prix moyen.
+
+
+Je clos cet exercice sur ce point. Pour l'utilisation des fonctions, je verrais dans un autre cours sur SQL. C'est plus pratique et je pourrais traité en profondeur.
