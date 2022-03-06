@@ -1878,4 +1878,20 @@ Comme on le sait, détruite est le plus facile que construire, ce bout de code r
         ?> 
     ```
 
+J'ai tésté les jointures dans ce bout de code. J'ai utilisé une jointure externe pour avoir le nom de l'utilisateur qui a écrit la recette. Ces deux informations sont récupérées de la table `users` et `recipes`. Je n'ai pas créé de clé secondaire, j'ai juste chérché une correspondance entre les deux tables et cela se situe au niveau de leur champ d'email respectif soit `email` et `author`.
+
+    ```
+      <?php   
+       $connexionSucceed = 'Vous etes connectez';
+        
+        // içi j'ai tésté une jointure externe pour m'exércer
+        $sqlQuery2 = ' SELECT `name`, `title`  FROM `users` `name` RIGHT JOIN `recipes` `title` ON `email` = `author`' ;
+        $recipesStatement = $mysqlConnection->prepare($sqlQuery2);
+        $recipesStatement->execute();
+        $recipes = $recipesStatement->fetchAll(); 
+        var_dump($recipes);   
+                        
+        ?> 
+        <?php include_once ('footer.php')?>
+    ```
 Je clos cet exercice sur ce point.
