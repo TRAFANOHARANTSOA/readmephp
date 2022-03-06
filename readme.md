@@ -1771,7 +1771,8 @@ Ensuite, j'envoi dans un lien l'identifiant vers une page `update.php`, que j'ai
                                     <p>Auteur : <?php echo $recipe[1]; ?></p>
                                     <p>Rôle : <?php echo $recipe[2]; ?></p>
                                     <p>Mail : <?php echo $recipe[3]; ?></p>
-                                    <a href ="update.php?id=<?php echo $recipe[5] ?>" class="btn btn-primary ">Modifier</a> 
+                                    <a href ="update.php?id=<?= $recipe[5] ?>" class="btn btn-primary ">Modifier</a> 
+                                    <a href ="update.php?id=<?= $recipe[5] ?>" class="btn btn-primary ">Supprimer</a> 
                                 </article>
                             </div>
                     </div>
@@ -1877,6 +1878,7 @@ Comme on le sait, détruite est le plus facile que construire, ce bout de code r
         }
         ?> 
     ```
+On n'oublie pas le petit bouton dans la page mes recettes pour envoyer l'id à notre page delete.
 ## Les jointures SQL
 Il en existe plusieurs mais les deux prinicpaux que j'ai utilisé sont les **jointures internes et externes**.
 1. Les jointures internes : elles ne sélectionnent que les données qui ont une correspondance entre les deux tables.

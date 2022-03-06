@@ -28,8 +28,8 @@
                                 <p>Auteur : <?php echo $recipe[1]; ?></p>
                                 <p>Rôle : <?php echo $recipe[2]; ?></p>
                                 <p>Mail : <?php echo $recipe[3]; ?></p>
-                                <a href ="update.php?id=<?php echo $recipe[5] ?>" class="btn btn-primary ">Modifier</a> 
-                                <a href ="delete.php?id=<?php echo $recipe[5] ?>" class="btn btn-primary ">Supprimer</a> 
+                                <a href ="update.php?id=<?= $recipe[5] ?>" class="btn btn-primary ">Modifier</a> 
+                                <a href ="delete.php?id=<?= $recipe[5] ?>" class="btn btn-primary ">Supprimer</a> 
                             </article>
                         </div>
                 </div>          
